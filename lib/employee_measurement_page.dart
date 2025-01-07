@@ -44,29 +44,52 @@ class _EmployeeMeasurementPageState extends State<EmployeeMeasurementPage> {
     if (await _requestPermissions()) {
       var excel = Excel.createExcel();
       Sheet sheetObject = excel['Sheet1'];
-
       // Add company name and creation date
       sheetObject.merge(CellIndex.indexByString("A1"), CellIndex.indexByString("B1"));
       sheetObject.cell(CellIndex.indexByString("A1")).value = widget.companyName.toUpperCase();
       sheetObject.cell(CellIndex.indexByString("C1")).value = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
 
       // Merge cells for "Shirt" and "Pant"
-      sheetObject.merge(CellIndex.indexByString("F1"), CellIndex.indexByString("M1"));
-      var shirtCell = sheetObject.cell(CellIndex.indexByString("F1"));
+      sheetObject.merge(CellIndex.indexByString("G1"), CellIndex.indexByString("N1"));
+      var shirtCell = sheetObject.cell(CellIndex.indexByString("G1"));
       shirtCell.value = 'SHIRT';
-      shirtCell.cellStyle = CellStyle(horizontalAlign: HorizontalAlign.Center);
+      shirtCell.cellStyle = CellStyle(horizontalAlign: HorizontalAlign.Center,backgroundColorHex: "#BF8F00");
 
-      sheetObject.merge(CellIndex.indexByString("O1"), CellIndex.indexByString("V1"));
-      var pantCell = sheetObject.cell(CellIndex.indexByString("O1"));
-      pantCell.value = 'PANT';
-      pantCell.cellStyle = CellStyle(horizontalAlign: HorizontalAlign.Center);
+      sheetObject.merge(CellIndex.indexByString("P1"), CellIndex.indexByString("W1"));
+var pantCell = sheetObject.cell(CellIndex.indexByString("P1"));
+pantCell.value = 'PANT';
+pantCell.cellStyle = CellStyle(horizontalAlign: HorizontalAlign.Center, backgroundColorHex: "#FF0000");
 
-      // Add headers
-      sheetObject.appendRow([
-        'SERIAL NUMBER', 'EMPLOYEE NAME', 'MOBILE NUMBER', 'DEPARTMENT', 'DESIGNATION',
-        'LENGTH', 'SHOULDER', 'SLEEVE', 'CHEST', 'WAIST', 'BOTTOM', 'NECK', 'REMARKS',
-        '', 'WAIST', 'SEAT', 'LENGTH', 'INNER LENGTH', 'THIGH', 'KNEE', 'BOTTOM', 'REMARKS'
-      ]);
+// Add headers
+List<String> headers = [
+  'SERIAL NUMBER', 'EMPLOYEE NAME', 'MOBILE NUMBER', 'DEPARTMENT', 'DESIGNATION','',
+  'LENGTH', 'SHOULDER', 'SLEEVE', 'CHEST', 'WAIST', 'BOTTOM', 'NECK', 'REMARKS',
+  '', 'WAIST', 'SEAT', 'LENGTH', 'INNER LENGTH', 'THIGH', 'KNEE', 'BOTTOM', 'REMARKS'
+];
+
+// Append headers
+sheetObject.appendRow(headers);
+
+// Apply styles to headers
+for (int i = 0; i < headers.length; i++) {
+  var cell = sheetObject.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 1));
+  if (['LENGTH', 'SHOULDER', 'SLEEVE', 'CHEST', 'WAIST', 'BOTTOM', 'NECK', 'REMARKS'].contains(headers[i]) && i < 14) {
+    cell.cellStyle = CellStyle(
+      backgroundColorHex: "#8EA9DB", // Color for shirt columns
+      horizontalAlign: HorizontalAlign.Center,
+    );
+  } else if (['WAIST', 'SEAT', 'LENGTH', 'INNER LENGTH', 'THIGH', 'KNEE', 'BOTTOM', 'REMARKS'].contains(headers[i]) && i > 13) {
+    cell.cellStyle = CellStyle(
+      backgroundColorHex: "#A9D08E", // Color for pant columns
+      horizontalAlign: HorizontalAlign.Center,
+    );
+  } else {
+    cell.cellStyle = CellStyle(
+      backgroundColorHex: "#FFFFFF", // Default color for other columns
+      horizontalAlign: HorizontalAlign.Center,
+    );
+  }
+}
 
       // Add data
       for (int i = 0; i < employeeData.length; i++) {
@@ -77,6 +100,7 @@ class _EmployeeMeasurementPageState extends State<EmployeeMeasurementPage> {
           data['Mobile Number'].toUpperCase(),
           data['Department'].toUpperCase(),
           data['Designation'].toUpperCase(),
+          '',
           data['Length']?.toUpperCase() ?? 'N/A',
           data['Shoulder']?.toUpperCase() ?? 'N/A',
           data['Sleeve']?.toUpperCase() ?? 'N/A',
